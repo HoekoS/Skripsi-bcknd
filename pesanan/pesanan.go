@@ -247,7 +247,7 @@ func Pesanan(w http.ResponseWriter, r *http.Request) {
 		// QUERY PROSES
 		queryPost := query.QueryPesananInsert + "VALUES ( '" + uuid.String() + "' , " + strconv.Itoa(pesanModel.FlagTakeAway) + " , '" + pesanModel.State + "' , '" + formatted + "', '" + pesanModel.NamaPelanggan + "', " + strconv.Itoa(pesanModel.NomerMeja) + ",'" + path + "') RETURNING * ;"
 		fmt.Println(queryPost)
-		err = qrcode.WriteFile("http://localhost:3636/menu_all.html?nom="+strconv.Itoa(pesanModel.NomerMeja)+"&not="+pesanModel.NomerNota, qrcode.Medium, 256, path)
+		err = qrcode.WriteFile("http://34.101.186.227:3737/user/menu_all.html?nom="+strconv.Itoa(pesanModel.NomerMeja)+"&not="+pesanModel.NomerNota, qrcode.Medium, 256, path)
 		// fmt.Println(err)
 		pesanQueryProces(dbPool, queryPost)
 		if err != nil {
