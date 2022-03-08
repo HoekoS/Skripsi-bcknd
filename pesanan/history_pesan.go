@@ -121,8 +121,10 @@ func historyDataToResult(resultHistory []model_struct.HistoryPesan, message stri
 }
 
 func viewHistoryQueryProces(dbPool *pgxpool.Pool, query string) ([]model_struct.ViewHistory, error) {
+	fmt.Println("cobaaaaaaaaaaaaaaaaaaaaa")
 	rows, err := dbPool.Query(context.Background(), query)
 	if err != nil {
+		log.Println("error di row kamu ini detailnya : ", err.Error())
 		return nil, err
 	}
 	for rows.Next() {
@@ -135,11 +137,13 @@ func viewHistoryQueryProces(dbPool *pgxpool.Pool, query string) ([]model_struct.
 
 		resultHistoryView = append(resultHistoryView, *historyViewPesanModel)
 	}
+	fmt.Println("di view history", resultHistoryView, query)
 
 	if err = rows.Err(); err != nil {
 		log.Fatal("error di row kamu ini detailnya : ", err.Error())
 		return nil, err
 	}
+	fmt.Println("di view history", resultHistoryView, query)
 	return resultHistoryView, err
 }
 
@@ -295,6 +299,10 @@ func HistoryPesanGet(w http.ResponseWriter, r *http.Request) {
 	} else {
 		date1 = dates1[0]
 	}
+	res1 := strings.Split(date1, "-")
+	date1 = res1[2] + "-" + res1[1] + "-" + res1[0]
+	fmt.Println(date1)
+	// date1 =
 
 	dates2, ok := r.URL.Query()["date2"]
 	if !ok || len(dates2[0]) < 1 {
@@ -303,11 +311,14 @@ func HistoryPesanGet(w http.ResponseWriter, r *http.Request) {
 	} else {
 		date2 = dates2[0]
 	}
+	res2 := strings.Split(date2, "-")
+	date2 = res2[2] + "-" + res2[1] + "-" + res2[0]
+	fmt.Println(date2)
 
 	if date1 == date2 {
-		where = " WHERE hp.date::DATE = '" + date1 + "'"
+		where = " WHERE date::DATE = '" + date1 + "'"
 	} else if date1 != "" && date2 != "" {
-		where = " WHERE hp.date BETWEEN '" + date1 + "' AND '" + date2 + "'"
+		where = " WHERE date BETWEEN '" + date1 + "' AND '" + date2 + "'"
 	} else {
 		where = ""
 	}
@@ -562,6 +573,8 @@ func HistoryCetakFix(w http.ResponseWriter, r *http.Request) {
 		} else {
 			date1 = dates1[0]
 		}
+		res1 := strings.Split(date1, "-")
+		date1 = res1[2] + "-" + res1[1] + "-" + res1[0]
 
 		dates2, ok := r.URL.Query()["date2"]
 		if !ok || len(dates2[0]) < 1 {
@@ -570,6 +583,9 @@ func HistoryCetakFix(w http.ResponseWriter, r *http.Request) {
 		} else {
 			date2 = dates2[0]
 		}
+		res2 := strings.Split(date2, "-")
+		date2 = res2[2] + "-" + res2[1] + "-" + res2[0]
+
 		m := pdf.NewMaroto(consts.Landscape, consts.A4)
 		m.SetPageMargins(10, 10, 10)
 		buildHeading(m, date1, date2)
@@ -632,18 +648,20 @@ func getDataExport(r *http.Request, date1 string, date2 string) [][]string {
 	defer dbPool.Close()
 
 	if date1 == date2 {
-		where = " WHERE hp.date::DATE = '" + date1 + "'"
+		where = " WHERE date::DATE = '" + date1 + "'"
 	} else if date1 != "" && date2 != "" {
-		where = " WHERE hp.date BETWEEN '" + date1 + "' AND '" + date2 + "'"
+		where = " WHERE date BETWEEN '" + date1 + "' AND '" + date2 + "'"
 	} else {
 		where = ""
 	}
 
 	queryForProces := query.QueryHistoryView + where
 	viewHistoryQueryProces(dbPool, queryForProces)
+	fmt.Println("stlh query proces", resultHistoryView)
 	if err != nil {
 		log.Println("error while executing query")
 	}
+	fmt.Println("sblm change", resultHistoryView)
 	datas := changeType(resultHistoryView)
 	// fmt.Println(datas)
 	return datas
@@ -651,6 +669,7 @@ func getDataExport(r *http.Request, date1 string, date2 string) [][]string {
 
 func changeType(data []model_struct.ViewHistory) [][]string {
 	var datas [][]string
+	// fmt.Println("print data di change", data)
 	for _, v := range data {
 		var floatFormat string = strconv.FormatFloat(float64(v.TotalPrice), 'f', 0, 32)
 		// fmt.Print(floatFormat, reflect.TypeOf(floatFormat))
@@ -741,6 +760,8 @@ func SendEmail(w http.ResponseWriter, r *http.Request) {
 		} else {
 			date1 = dates1[0]
 		}
+		res1 := strings.Split(date1, "-")
+		date1 = res1[2] + "-" + res1[1] + "-" + res1[0]
 
 		dates2, ok := r.URL.Query()["date2"]
 		if !ok || len(dates2[0]) < 1 {
@@ -749,12 +770,14 @@ func SendEmail(w http.ResponseWriter, r *http.Request) {
 		} else {
 			date2 = dates2[0]
 		}
+		res2 := strings.Split(date2, "-")
+		date2 = res2[2] + "-" + res2[1] + "-" + res2[0]
 
 		const CONFIG_SMTP_HOST = "smtp.gmail.com"
 		const CONFIG_SMTP_PORT = 587
 		const CONFIG_SENDER_NAME = "CAFE SAKO - History Pesanan <hoeko10899@gmail.com>"
 		const CONFIG_AUTH_EMAIL = "hoeko10899@gmail.com"
-		const CONFIG_AUTH_PASSWORD = "xwwetelnqzloawoa"
+		const CONFIG_AUTH_PASSWORD = "vdszltrkhxtfugyn"
 
 		mailer := gomail.NewMessage()
 		mailer.SetHeader("From", CONFIG_SENDER_NAME)

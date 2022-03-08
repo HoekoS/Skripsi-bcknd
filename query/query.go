@@ -34,14 +34,17 @@ var QueryHistoryGetOne string = "SELECT * FROM history_pesanan where id = "
 var QueryHistoryUpdate string = "UPDATE public.history_pesanan"
 var QueryHistoryDelete string = "DELETE FROM history_pesanan WHERE id= "
 var QueryHistoryView = `
-SELECT hp.no_nota,p.nama_pelanggan,hp.total_price,
-	Case 
-		WHEN p.flag_take_away = 1 THEN 'Take Away'
-		ELSE 'Dine In'
-	END AS status_ta,
-	hp.date
-FROM history_pesanan AS hp
-JOIN pesanan AS p ON p.no_nota = hp.no_nota `
+SELECT *
+FROM(
+	SELECT hp.no_nota,p.nama_pelanggan,hp.total_price,
+        Case 
+                WHEN p.flag_take_away = 1 THEN 'Take Away'
+                ELSE 'Dine In'
+		END AS status_ta,
+		hp.date::DATE
+	FROM history_pesanan AS hp
+	JOIN pesanan AS p ON p.no_nota = hp.no_nota  
+) AS fx `
 var QueryHistoryDetail = `
 select hp.no_nota,m.name,m.price,dp.quantity,(m.price*dp.quantity) as total_price,hp.total_price as total_price_pesanan,dp.catatan
 from history_pesanan as hp

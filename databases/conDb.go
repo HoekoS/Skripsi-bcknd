@@ -7,7 +7,9 @@ import (
 )
 
 func Connect() (dbPool *pgxpool.Pool, err error) {
-	dbPool, err = pgxpool.Connect(context.Background(), "postgres://postgres:salatigahatiberiman@34.101.155.53:5432/postgres")
+	// "postgres://postgres:salatigahatiberiman@34.101.155.53:5432/postgres"
+	// dbPool, err = pgxpool.Connect(context.Background(), os.Getenv("GO_DATABASE_URL"))
+	dbPool, err = pgxpool.Connect(context.Background(), "postgres://postgres:salatiga123@34.101.251.192/postgres")
 
 	if err != nil {
 		return nil, err
